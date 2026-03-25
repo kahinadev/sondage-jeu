@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sondage</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0A0A;
+      --surface: #141414;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-active: rgba(255, 255, 255, 0.7);
+      --text: #F5F5F5;
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --text-subtle: rgba(255, 255, 255, 0.65);
+      --white: #FFFFFF;
+      --black: #0A0A0A;
+      --error: #FF6B6B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .header {
+      padding: 48px 0 40px;
+      animation: fadeDown 0.5s ease;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: fadeUp 0.4s ease;
+    }
+
+    /* ── INTRO ── */
+    .intro-content {
+      padding: 20px 0 40px;
+    }
+
+    .intro-content h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 7vw, 3.2rem);
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+
+    .intro-content h1 em {
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .intro-content p {
+      font-size: 1rem;
+      line-height: 1.8;
+      text-align: justify;
+      color: var(--text-subtle);
+      margin-bottom: 20px;
+    }
+
+    .intro-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 28px 0 36px;
+    }
+
+    .intro-meta::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      background: var(--white);
+      border-radius: 50%;
+      opacity: 0.35;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 36px;
+    }
+
+    .btn-start {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--white);
+      color: var(--black);
+      padding: 16px 32px;
+      border-radius: 999px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-start:hover {
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(-2px);
+    }
+
+    .arrow {
+      transition: transform 0.2s;
+    }
+
+    .btn-start:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      margin-bottom: 44px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--white);
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    /* ── QUESTION ── */
+    .q-number {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .q-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.2rem, 4vw, 1.55rem);
+      line-height: 1.45;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .q-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── OPTIONS ── */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 15px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 400;
+      color: var(--text-subtle);
+      text-align: left;
+      width: 100%;
+    }
+
+    .option:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .option.selected {
+      border-color: var(--white);
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .opt-dot {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      transition: all 0.15s;
+    }
+
+    .option.selected .opt-dot {
+      background: var(--white);
+      border-color: var(--white);
+    }
+
+    .option.selected .opt-dot::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: var(--black);
+    }
+
+    .option.multi .opt-dot {
+      border-radius: 4px;
+    }
+
+    .option.multi.selected .opt-dot::after {
+      content: '✓';
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--black);
+      background: transparent;
+      border-radius: 0;
+    }
+
+    /* ── AUTRE INPUT ── */
+    .autre-input {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--white);
+      background: transparent;
+      outline: none;
+      transition: border-color 0.15s;
+      display: none;
+    }
+
+    .autre-input.visible {
+      display: block;
+    }
+
+    .autre-input:focus {
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .autre-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ── SCALE ── */
+    .scale-wrap {
+      display: flex;
+      gap: 6px;
+    }
+
+    .scale-btn {
+      flex: 1;
+      padding: 15px 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .scale-btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: var(--white);
+    }
+
+    .scale-btn.selected {
+      border-color: var(--white);
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* ── INPUTS ── */
+    .text-input,
+    .line-input {
+      width: 100%;
+      padding: 15px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--white);
+      background: transparent;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .text-input {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .text-input:focus,
+    .line-input:focus {
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .text-input::placeholder,
+    .line-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ── NAV ── */
+    .nav {
+      display: flex;
+      gap: 10px;
+      margin-top: 40px;
+    }
+
+    .btn-next {
+      flex: 1;
+      padding: 16px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-next:hover {
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(-1px);
+    }
+
+    .btn-next:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-prev {
+      padding: 16px 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-prev:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: var(--white);
+    }
+
+    /* ── ICON ── */
+
+    i {
+      font-size: 25px;
+    }
+
+    /* ── ERROR ── */
+    .error-msg {
+      color: var(--error);
+      font-size: 0.78rem;
+      font-weight: 500;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    /* ── THANKS ── */
+    .thanks-content {
+      padding: 60px 0;
+    }
+
+    .thanks-content h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 7vw, 3rem);
+      color: var(--white);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .thanks-content h2 em {
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .thanks-content>p {
+      font-size: 0.95rem;
+      color: var(--text-subtle);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .refresh-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+    }
+
+    .refresh-box p {
+      font-size: 0.88rem;
+      color: var(--text-subtle);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      color: var(--black);
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-refresh:hover {
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(-1px);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .scale-wrap {
+        gap: 4px;
+      }
+
+      .scale-btn {
+        padding: 13px 3px;
+        font-size: 0.88rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+
+    <div class="header"></div>
+
+    <!-- INTRO -->
+    <div class="screen active" id="screen-intro">
+      <div class="intro-content">
+        <h1>Salut ! <br> <em>Merci d'être là <i class="fa-regular fa-face-grin-hearts"></i></em></h1>
+        <p>
+          Je m'appelle Kahina et je suis actuellement en train de développer une entreprise de jeux éducatifs pour
+          lutter contre les préjugés, la discrimination et l'islamophobie, par le rire et le jeu. Parce qu'on apprend
+          mieux en riant et en s'amusant qu'en écoutant un discours.
+          <br>
+          Pour construire le <strong>premier jeu</strong> sérieusement, j'ai besoin de toi ! Les réponses à ce sondage me permettront à
+          lafois de mieux comprendre la demande, mais aussi de faire un jeu qui te correspond vraiment.
+        </p>
+        <div class="intro-meta"><strong>Moins de 3 minutes</strong></div>
+        <div class="divider"></div>
+        <button class="btn-start" onclick="startSurvey()">Commencer <span class="arrow">→</span></button>
+      </div>
+    </div>
+
+    <!-- SURVEY -->
+    <div class="screen" id="screen-survey">
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span id="progress-label">1 / 11</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <div id="question-wrap">
+        <div class="section-label" id="section-label"></div>
+        <div class="q-number" id="q-number">01</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="q-subtitle" id="q-subtitle"></div>
+        <div id="q-body"></div>
+        <div class="error-msg" id="error-msg">Merci de répondre à cette question pour continuer.</div>
+      </div>
+      <div class="nav">
+        <button class="btn-prev" id="btn-prev" onclick="prevQ()" style="display:none">← Retour</button>
+        <button class="btn-next" id="btn-next" onclick="nextQ()">Continuer →</button>
+      </div>
+      <div class="loading" id="loading">
+        <div class="spinner"></div> Envoi en cours...
+      </div>
+    </div>
+
+    <!-- THANKS -->
+    <div class="screen" id="screen-thanks">
+      <div class="thanks-content">
+        <h2>Merci<br><em>infiniment !</em></h2>
+        <p>Ta réponse a bien été enregistrée. Elle m'aide énormément à construire ce projet.</p>
+        <div class="refresh-box">
+          <p>Un ami veut répondre à son tour ? Il suffit de rafraîchir la page — chaque réponse est indépendante.</p>
+          <button class="btn-refresh" onclick="location.reload()">↺ &nbsp;Nouvelle réponse</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywxvB5FA8ZE2LiY8wDhYEj-FwT3fICP3eDFfOLhCy419vgJ68IB-aCsijiPhJcvKS2Dg/exec";
+
+    const QUESTIONS = [
+      { id: "prenom_nom", text: "Quel est ton prénom et ton nom ?", type: "line_input", placeholder: "Prénom et nom...", required: true, section: "Identité" },
+      { id: "profil_age", text: "Tu as quel âge ?", type: "single", options: ["Moins de 15 ans", "15 – 17 ans", "18 – 25 ans", "26 – 35 ans", "Plus de 35 ans"], section: "Identité" },
+      { id: "activite", text: "Quelle est ton activité ?", type: "single", options: ["Salarié(e)", "Étudiant(e)", "Lycéen(ne)", "Sans emploi", "Entrepreneur(e)", "Autre"], section: "Identité" },
+      { id: "profil_religion", text: "Tu te considères comme... ?", type: "single", options: ["Musulman(e)", "Non-musulman(e)", "Athée", "Agnostique", "Autre"], section: "Identité" },
+      { id: "jeux_enligne", text: "Joues-tu à des jeux en ligne ?", type: "single", options: ["Oui, souvent", "Parfois", "Rarement", "Non, jamais"], section: "Le jeu" },
+      { id: "prejudices_jeu", text: "Penses-tu qu'un jeu sur l'Islam peut lutter contre l'islamophobie et les préjugés ?", type: "scale", min: "Pas du tout", max: "Absolument", section: "Le jeu" },
+      { id: "concept_interet", text: "Le concept d'un jeu sur l'Islam t'intéresse-t-il ?", type: "scale", min: "Pas du tout", max: "Vraiment beaucoup", section: "Le jeu" },
+      { id: "format_jeu", text: "Sur quel format vois-tu le jeu ?", type: "single", options: ["Jeu de société", "Jeu interactif sur mobile", "Les deux"], subtitle: "Un jeu vidéo est également prévu, mais pour bien plus tard.", section: "Le jeu" },
+      { id: "aspects_islam", text: "Quels aspects de l'Islam t'intéresseraient dans un jeu ?", type: "multi", options: ["Histoire", "Figures importantes", "Culture et art", "Sciences", "Valeurs et éthique", "Autre"], section: "Le jeu" },
+      { id: "attrayant", text: "Qu'est-ce qui rendrait le jeu attrayant pour toi ?", type: "multi", options: ["Un design soigné", "Vraiment apprendre quelque chose", "Des questions variées et originales", "Un système de points et classement", "Des anecdotes et infos surprenantes", "Chronomètre", "Mode solo et multijoueur", "Autre"], section: "Le jeu" },
+      { id: "commentaire", text: "Tu as une idée, une suggestion ou un commentaire ?", type: "text", placeholder: "Écris ici...", required: false, section: "Suggestions" }
+    ];
+
+    let current = 0;
+    let answers = {};
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startSurvey() {
+      showScreen('screen-survey');
+      render();
+    }
+
+    function render() {
+      const q = QUESTIONS[current];
+      const total = QUESTIONS.length;
+      const pct = Math.round((current / total) * 100);
+
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = `${current + 1} / ${total}`;
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('q-number').textContent = String(current + 1).padStart(2, '0');
+      document.getElementById('q-text').textContent = q.text;
+      document.getElementById('section-label').textContent = q.section || '';
+      const subtitleEl = document.getElementById('q-subtitle');
+      subtitleEl.textContent = q.subtitle || '';
+      subtitleEl.style.display = q.subtitle ? 'block' : 'none';
+      document.getElementById('error-msg').classList.remove('show');
+      document.getElementById('btn-prev').style.display = current > 0 ? 'block' : 'none';
+
+      const isLast = current === total - 1;
+      const btnNext = document.getElementById('btn-next');
+      btnNext.textContent = isLast ? 'Envoyer →' : 'Continuer →';
+      btnNext.onclick = isLast ? submitForm : nextQ;
+
+      const body = document.getElementById('q-body');
+      body.innerHTML = '';
+
+      if (q.type === 'single') {
+        const wrap = document.createElement('div');
+        wrap.className = 'options';
+        let autreInput = null;
+        const otherOpts = q.options.slice(0, -1);
+
+        q.options.forEach(opt => {
+          const isAutre = opt === 'Autre';
+          const btn = document.createElement('button');
+          const isSelected = isAutre
+            ? (answers[q.id] && !otherOpts.includes(answers[q.id]))
+            : answers[q.id] === opt;
+          btn.className = 'option' + (isSelected ? ' selected' : '');
+          btn.innerHTML = `<span class="opt-dot"></span><span>${opt}</span>`;
+          btn.onclick = () => {
+            wrap.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('error-msg').classList.remove('show');
+            if (isAutre) {
+              answers[q.id] = autreInput.value || 'Autre';
+              autreInput.classList.add('visible');
+              autreInput.focus();
+            } else {
+              answers[q.id] = opt;
+              if (autreInput) autreInput.classList.remove('visible');
+            }
+          };
+          wrap.appendChild(btn);
+
+          if (isAutre) {
+            autreInput = document.createElement('input');
+            autreInput.type = 'text';
+            autreInput.className = 'autre-input' + (answers[q.id] && !otherOpts.includes(answers[q.id]) ? ' visible' : '');
+            autreInput.placeholder = 'Précise ta réponse...';
+            autreInput.value = (answers[q.id] && !otherOpts.includes(answers[q.id])) ? answers[q.id] : '';
+            autreInput.oninput = (e) => { answers[q.id] = e.target.value || 'Autre'; };
+            wrap.appendChild(autreInput);
+          }
+        });
+        body.appendChild(wrap);
+      }
+
+      else if (q.type === 'multi') {
+        if (!answers[q.id]) answers[q.id] = [];
+        const wrap = document.createElement('div');
+        wrap.className = 'options';
+        const hint = document.createElement('p');
+        hint.className = 'hint';
+        hint.textContent = 'Plusieurs réponses possibles';
+        wrap.appendChild(hint);
+        let autreInput = null;
+
+        q.options.forEach(opt => {
+          const isAutre = opt === 'Autre';
+          const autreKey = q.id + '_autre';
+          const btn = document.createElement('button');
+          const isSelected = isAutre ? answers[q.id].includes('Autre') : answers[q.id].includes(opt);
+          btn.className = 'option multi' + (isSelected ? ' selected' : '');
+          btn.innerHTML = `<span class="opt-dot"></span><span>${opt}</span>`;
+          btn.onclick = () => {
+            if (isAutre) {
+              if (answers[q.id].includes('Autre')) {
+                answers[q.id] = answers[q.id].filter(o => o !== 'Autre');
+                delete answers[autreKey];
+                btn.classList.remove('selected');
+                if (autreInput) autreInput.classList.remove('visible');
+              } else {
+                answers[q.id].push('Autre');
+                btn.classList.add('selected');
+                if (autreInput) { autreInput.classList.add('visible'); autreInput.focus(); }
+              }
+            } else {
+              if (answers[q.id].includes(opt)) {
+                answers[q.id] = answers[q.id].filter(o => o !== opt);
+                btn.classList.remove('selected');
+              } else {
+                answers[q.id].push(opt);
+                btn.classList.add('selected');
+              }
+            }
+            document.getElementById('error-msg').classList.remove('show');
+          };
+          wrap.appendChild(btn);
+
+          if (isAutre) {
+            autreInput = document.createElement('input');
+            autreInput.type = 'text';
+            autreInput.className = 'autre-input' + (answers[autreKey] ? ' visible' : '');
+            autreInput.placeholder = 'Précise ta réponse...';
+            autreInput.value = answers[autreKey] || '';
+            autreInput.oninput = (e) => { answers[autreKey] = e.target.value; };
+            wrap.appendChild(autreInput);
+          }
+        });
+        body.appendChild(wrap);
+      }
+
+      else if (q.type === 'scale') {
+        const wrap = document.createElement('div');
+        const scaleWrap = document.createElement('div');
+        scaleWrap.className = 'scale-wrap';
+        for (let i = 1; i <= 5; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'scale-btn' + (answers[q.id] === i ? ' selected' : '');
+          btn.textContent = i;
+          btn.onclick = () => {
+            answers[q.id] = i;
+            scaleWrap.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('error-msg').classList.remove('show');
+          };
+          scaleWrap.appendChild(btn);
+        }
+        const labels = document.createElement('div');
+        labels.className = 'scale-labels';
+        labels.innerHTML = `<span>${q.min}</span><span>${q.max}</span>`;
+        wrap.appendChild(scaleWrap);
+        wrap.appendChild(labels);
+        body.appendChild(wrap);
+      }
+
+      else if (q.type === 'text') {
+        const ta = document.createElement('textarea');
+        ta.className = 'text-input';
+        ta.placeholder = q.placeholder || '';
+        ta.value = answers[q.id] || '';
+        ta.oninput = (e) => { answers[q.id] = e.target.value; };
+        body.appendChild(ta);
+      }
+
+      else if (q.type === 'line_input') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'line-input';
+        input.placeholder = q.placeholder || '';
+        input.value = answers[q.id] || '';
+        input.oninput = (e) => { answers[q.id] = e.target.value; };
+        body.appendChild(input);
+      }
+
+      const wrap = document.getElementById('question-wrap');
+      wrap.style.animation = 'none';
+      wrap.offsetHeight;
+      wrap.style.animation = 'fadeUp 0.3s ease both';
+    }
+
+    function validate() {
+      const q = QUESTIONS[current];
+      if (q.required === false) return true;
+      if (q.type === 'multi') return answers[q.id] && answers[q.id].length > 0;
+      if (q.type === 'text') return true;
+      return !!answers[q.id];
+    }
+
+    function nextQ() {
+      if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
+      if (current < QUESTIONS.length - 1) { current++; render(); }
+    }
+
+    function prevQ() {
+      if (current > 0) { current--; render(); }
+    }
+
+    async function submitForm() {
+      if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
+      answers['timestamp'] = new Date().toLocaleString('fr-FR');
+      const btnNext = document.getElementById('btn-next');
+      btnNext.disabled = true;
+      document.getElementById('loading').classList.add('show');
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(answers)
+        });
+      } catch (e) { }
+      document.getElementById('loading').classList.remove('show');
+      showScreen('screen-thanks');
+    }
+  </script>
+  <script src="https://kit.fontawesome.com/6744aeacbc.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
