@@ -638,7 +638,8 @@
         <h2>Merci<br><em>infiniment 🤍 !</em></h2>
         <p>Ta réponse a bien été enregistrée. Elle m'aide énormément à construire ce projet.</p>
         <div class="refresh-box">
-          <p>Un ami veut répondre à son tour ? <br> Il suffit de rafraîchir la page. Chaque réponse est indépendante.</p>
+          <p>Un ami veut répondre à son tour ? <br> Il suffit de rafraîchir la page. Chaque réponse est indépendante.
+          </p>
           <button class="btn-refresh" onclick="location.reload()">↺ &nbsp;Nouvelle réponse</button>
         </div>
       </div>
@@ -649,7 +650,6 @@
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywxvB5FA8ZE2LiY8wDhYEj-FwT3fICP3eDFfOLhCy419vgJ68IB-aCsijiPhJcvKS2Dg/exec";
 
     // ── ALL QUESTIONS ──
-    // showIf: { questionId, value } → question shown only if answers[questionId] === value
     const ALL_QUESTIONS = [
 
       // ── PROFIL ──
@@ -805,7 +805,7 @@
       },
       {
         id: "concept_interet",
-        text: "Notre premier jeu portera sur l'Islam et son histoire. Est-ce que ce concept t'intéresse ?",
+        text: "Notre première gamme de jeu portera sur l'Islam et son histoire. . Est-ce que ce concept t'intéresse ?",
         type: "scale",
         min: "Pas du tout",
         max: "Vraiment beaucoup",
@@ -884,14 +884,10 @@
     ];
 
     let answers = {};
-    let history = []; // stack of question indices shown
 
-    // Build the active question list based on current answers
+    // Keep the exact same question order for everyone
     function buildFlow() {
-      return ALL_QUESTIONS.filter(q => {
-        if (!q.showIf) return true;
-        return answers[q.showIf.questionId] === q.showIf.value;
-      });
+      return ALL_QUESTIONS;
     }
 
     let QUESTIONS = buildFlow();
@@ -1183,7 +1179,6 @@
 
     function nextQ() {
       if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
-      // Rebuild flow after answering (handles conditional questions)
       QUESTIONS = buildFlow();
       if (current < QUESTIONS.length - 1) { current++; render(); }
     }
@@ -1192,9 +1187,47 @@
       if (current > 0) { current--; render(); }
     }
 
+    function buildSubmissionPayload() {
+      const payload = {
+        timestamp: new Date().toLocaleString('fr-FR')
+      };
+
+      ALL_QUESTIONS.forEach(q => {
+        if (q.type === 'multi') {
+          payload[q.id] = Array.isArray(answers[q.id]) ? answers[q.id].join(' | ') : '';
+          if (q.options && q.options.includes('Autre')) {
+            payload[q.id + '_autre'] = answers[q.id + '_autre'] || '';
+          }
+          return;
+        }
+
+        if (q.type === 'single_with_open') {
+          const choice = answers[q.id + '_choice'] || answers[q.id] || '';
+          payload[q.id] = choice;
+          payload[q.id + '_detail'] = choice === 'Oui'
+            ? (answers[q.id + '_detail'] || '')
+            : 'Non concerné';
+          return;
+        }
+
+        payload[q.id] = answers[q.id] || '';
+      });
+
+      if (payload.education_religieuse !== 'Oui') {
+        payload.enseignements_retenus = 'Non concerné';
+        payload.application_quotidien = 'Non concerné';
+      }
+
+      if (payload.discrimination !== 'Oui') {
+        payload.discrimination_impact = 'Non concerné';
+      }
+
+      return payload;
+    }
+
     async function submitForm() {
       if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
-      answers['timestamp'] = new Date().toLocaleString('fr-FR');
+      const payload = buildSubmissionPayload();
       const btnNext = document.getElementById('btn-next');
       btnNext.disabled = true;
       document.getElementById('loading').classList.add('show');
@@ -1202,12 +1235,12 @@
         await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST', mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(answers)
+          body: JSON.stringify(payload)
         });
       } catch (e) { }
       document.getElementById('loading').classList.remove('show');
       showScreen('screen-thanks');
-    }
+    } 
   </script>
   <script src="https://kit.fontawesome.com/6744aeacbc.js" crossorigin="anonymous"></script>
 </body>
