@@ -650,6 +650,7 @@
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywxvB5FA8ZE2LiY8wDhYEj-FwT3fICP3eDFfOLhCy419vgJ68IB-aCsijiPhJcvKS2Dg/exec";
 
     // ── ALL QUESTIONS ──
+    // showIf: { questionId, value } → question shown only if answers[questionId] === value
     const ALL_QUESTIONS = [
 
       // ── PROFIL ──
@@ -884,8 +885,9 @@
     ];
 
     let answers = {};
+    let history = []; // stack of question indices shown
 
-    // Keep the exact same question order for everyone
+    // Build the active question list based on current answers
     function buildFlow() {
       return ALL_QUESTIONS;
     }
@@ -1179,6 +1181,7 @@
 
     function nextQ() {
       if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
+      // Rebuild flow after answering (handles conditional questions)
       QUESTIONS = buildFlow();
       if (current < QUESTIONS.length - 1) { current++; render(); }
     }
@@ -1187,42 +1190,71 @@
       if (current > 0) { current--; render(); }
     }
 
+
+    function normalizeSingleWithOther(questionId) {
+      const raw = answers[questionId];
+      if (!raw) return '';
+      return String(raw).trim();
+    }
+
+    function normalizeMulti(questionId) {
+      const selected = Array.isArray(answers[questionId]) ? [...answers[questionId]] : [];
+      const otherText = (answers[questionId + '_autre'] || '').trim();
+
+      const normalized = selected
+        .filter(v => v && v !== 'Autre')
+        .map(v => String(v).trim());
+
+      if (selected.includes('Autre')) {
+        normalized.push(otherText ? `Autre : ${otherText}` : 'Autre');
+      }
+
+      return normalized.join(' | ');
+    }
+
+    function normalizeSingleWithOpen(questionId) {
+      const choice = answers[questionId + '_choice'] || answers[questionId] || '';
+      const detail = (answers[questionId + '_detail'] || '').trim();
+
+      if (!choice) return '';
+      if (choice === 'Oui') return detail ? `Oui : ${detail}` : 'Oui';
+      return choice;
+    }
+
     function buildSubmissionPayload() {
-      const payload = {
-        timestamp: new Date().toLocaleString('fr-FR')
+      const education = answers['education_religieuse'] || '';
+      const discrimination = answers['discrimination'] || '';
+
+      return {
+        genre: normalizeSingleWithOther('genre'),
+        age: answers['age'] || '',
+        activite: normalizeSingleWithOther('activite'),
+        religion: (answers['religion'] || '').trim(),
+        education_religieuse: education,
+        enseignements_retenus: education === 'Non'
+          ? 'Non concerné'
+          : (answers['enseignements_retenus'] || '').trim(),
+        application_quotidien: education === 'Non'
+          ? 'Non concerné'
+          : (answers['application_quotidien'] || ''),
+        discrimination: discrimination,
+        discrimination_impact: discrimination === 'Non'
+          ? 'Non concerné'
+          : (answers['discrimination_impact'] || '').trim(),
+        rapport_religion: (answers['rapport_religion'] || '').trim(),
+        prejuges_religion: normalizeSingleWithOpen('prejuges_religion'),
+        jeux_enligne: answers['jeux_enligne'] || '',
+        type_jeux: normalizeMulti('type_jeux'),
+        recherche_jeu: normalizeMulti('recherche_jeu'),
+        format_jeu: answers['format_jeu'] || '',
+        prejudices_jeu: answers['prejudices_jeu'] || '',
+        concept_interet: answers['concept_interet'] || '',
+        aspects_islam: normalizeMulti('aspects_islam'),
+        important_jeu: normalizeMulti('important_jeu'),
+        attrayant: normalizeMulti('attrayant'),
+        budget: answers['budget'] || '',
+        commentaire: (answers['commentaire'] || '').trim()
       };
-
-      ALL_QUESTIONS.forEach(q => {
-        if (q.type === 'multi') {
-          payload[q.id] = Array.isArray(answers[q.id]) ? answers[q.id].join(' | ') : '';
-          if (q.options && q.options.includes('Autre')) {
-            payload[q.id + '_autre'] = answers[q.id + '_autre'] || '';
-          }
-          return;
-        }
-
-        if (q.type === 'single_with_open') {
-          const choice = answers[q.id + '_choice'] || answers[q.id] || '';
-          payload[q.id] = choice;
-          payload[q.id + '_detail'] = choice === 'Oui'
-            ? (answers[q.id + '_detail'] || '')
-            : 'Non concerné';
-          return;
-        }
-
-        payload[q.id] = answers[q.id] || '';
-      });
-
-      if (payload.education_religieuse !== 'Oui') {
-        payload.enseignements_retenus = 'Non concerné';
-        payload.application_quotidien = 'Non concerné';
-      }
-
-      if (payload.discrimination !== 'Oui') {
-        payload.discrimination_impact = 'Non concerné';
-      }
-
-      return payload;
     }
 
     async function submitForm() {
@@ -1233,14 +1265,15 @@
       document.getElementById('loading').classList.add('show');
       try {
         await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
+          method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
       } catch (e) { }
       document.getElementById('loading').classList.remove('show');
       showScreen('screen-thanks');
-    } 
+    }
   </script>
   <script src="https://kit.fontawesome.com/6744aeacbc.js" crossorigin="anonymous"></script>
 </body>
