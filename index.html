@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sondage</title>
+  <title>Sondage - Jeu éducatif</title>
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
     rel="stylesheet">
@@ -432,7 +432,6 @@
     }
 
     /* ── ICON ── */
-
     i {
       font-size: 25px;
     }
@@ -586,14 +585,20 @@
       <div class="intro-content">
         <h1>Salut ! <br> <em>Merci d'être là <i class="fa-regular fa-face-grin-hearts"></i></em></h1>
         <p>
-          Je m'appelle Kahina et je suis actuellement en train de développer une entreprise de jeux éducatifs pour
-          lutter contre les préjugés, la discrimination et l'islamophobie, par le rire et le jeu. Parce qu'on apprend
-          mieux en riant et en s'amusant qu'en écoutant un discours.
+          Je m'appelle Kahina et je suis en train de créer un studio de jeux éducatifs pour parler de sujets importants
+          comme les préjugés, les différences et la façon dont on perçoit parfois les autres, le tout avec humour et de
+          manière ludique.
           <br>
-          Pour construire le <strong>premier jeu</strong> sérieusement, j'ai besoin de toi ! Les réponses à ce sondage me permettront à
-          lafois de mieux comprendre la demande, mais aussi de faire un jeu qui te correspond vraiment.
+          <br>
+          L'idée, c'est de faire réfléchir tout en s'amusant, parce qu'on retient souvent mieux quand on passe un bon
+          moment.
+          <br>
+          <br>
+          Pour créer cette <strong>première gamme de jeux éducatifs multi-formats</strong>, j'ai besoin de ton avis !
+          Tes réponses à ce
+          sondage m'aideront à imaginer des jeux qui te parlent vraiment et qui correspondent à tes attentes.
         </p>
-        <div class="intro-meta"><strong>Moins de 3 minutes</strong></div>
+        <div class="intro-meta"><strong>Moins de 5 minutes</strong></div>
         <div class="divider"></div>
         <button class="btn-start" onclick="startSurvey()">Commencer <span class="arrow">→</span></button>
       </div>
@@ -603,7 +608,7 @@
     <div class="screen" id="screen-survey">
       <div class="progress-wrap">
         <div class="progress-top">
-          <span id="progress-label">1 / 11</span>
+          <span id="progress-label">1 / ?</span>
           <span id="progress-pct">0%</span>
         </div>
         <div class="progress-bar">
@@ -630,10 +635,10 @@
     <!-- THANKS -->
     <div class="screen" id="screen-thanks">
       <div class="thanks-content">
-        <h2>Merci<br><em>infiniment !</em></h2>
+        <h2>Merci<br><em>infiniment 🤍 !</em></h2>
         <p>Ta réponse a bien été enregistrée. Elle m'aide énormément à construire ce projet.</p>
         <div class="refresh-box">
-          <p>Un ami veut répondre à son tour ? Il suffit de rafraîchir la page — chaque réponse est indépendante.</p>
+          <p>Un ami veut répondre à son tour ? <br> Il suffit de rafraîchir la page. Chaque réponse est indépendante.</p>
           <button class="btn-refresh" onclick="location.reload()">↺ &nbsp;Nouvelle réponse</button>
         </div>
       </div>
@@ -643,23 +648,254 @@
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywxvB5FA8ZE2LiY8wDhYEj-FwT3fICP3eDFfOLhCy419vgJ68IB-aCsijiPhJcvKS2Dg/exec";
 
-    const QUESTIONS = [
-      { id: "prenom_nom", text: "Quel est ton prénom et ton nom ?", type: "line_input", placeholder: "Prénom et nom...", required: true, section: "Identité" },
-      { id: "profil_age", text: "Tu as quel âge ?", type: "single", options: ["Moins de 15 ans", "15 – 17 ans", "18 – 25 ans", "26 – 35 ans", "Plus de 35 ans"], section: "Identité" },
-      { id: "activite", text: "Quelle est ton activité ?", type: "single", options: ["Salarié(e)", "Étudiant(e)", "Lycéen(ne)", "Sans emploi", "Entrepreneur(e)", "Autre"], section: "Identité" },
-      { id: "profil_religion", text: "Tu te considères comme... ?", type: "single", options: ["Musulman(e)", "Non-musulman(e)", "Athée", "Agnostique", "Autre"], section: "Identité" },
-      { id: "jeux_enligne", text: "Joues-tu à des jeux en ligne ?", type: "single", options: ["Oui, souvent", "Parfois", "Rarement", "Non, jamais"], section: "Le jeu" },
-      { id: "prejudices_jeu", text: "Penses-tu qu'un jeu sur l'Islam peut lutter contre l'islamophobie et les préjugés ?", type: "scale", min: "Pas du tout", max: "Absolument", section: "Le jeu" },
-      { id: "concept_interet", text: "Le concept d'un jeu sur l'Islam t'intéresse-t-il ?", type: "scale", min: "Pas du tout", max: "Vraiment beaucoup", section: "Le jeu" },
-      { id: "format_jeu", text: "Sur quel format vois-tu le jeu ?", type: "single", options: ["Jeu de société", "Jeu interactif sur mobile", "Les deux"], subtitle: "Un jeu vidéo est également prévu, mais pour bien plus tard.", section: "Le jeu" },
-      { id: "aspects_islam", text: "Quels aspects de l'Islam t'intéresseraient dans un jeu ?", type: "multi", options: ["Histoire", "Figures importantes", "Culture et art", "Sciences", "Valeurs et éthique", "Autre"], section: "Le jeu" },
-      { id: "attrayant", text: "Qu'est-ce qui rendrait le jeu attrayant pour toi ?", type: "multi", options: ["Un design soigné", "Vraiment apprendre quelque chose", "Des questions variées et originales", "Un système de points et classement", "Des anecdotes et infos surprenantes", "Chronomètre", "Mode solo et multijoueur", "Autre"], section: "Le jeu" },
-      { id: "budget", text: "Combien serais-tu prêt(e) à payer pour jouer à ce jeu ?", type: "single", options: ["Moins de 5€", "Entre 5€ et 10€", "Entre 10€ et 20€", "Plus de 20€", "Je ne paierais pas, je veux que ce soit gratuit"], section: "Suggestions" },
-      { id: "commentaire", text: "Tu as une idée, une suggestion ou un commentaire ?", type: "text", placeholder: "Écris ici...", required: false, section: "Suggestions" }
+    // ── ALL QUESTIONS ──
+    // showIf: { questionId, value } → question shown only if answers[questionId] === value
+    const ALL_QUESTIONS = [
+
+      // ── PROFIL ──
+      {
+        id: "genre",
+        text: "Tu es... ?",
+        type: "single",
+        options: ["Femme", "Homme", "Autre", "Je préfère ne pas répondre"],
+        section: "Profil"
+      },
+      {
+        id: "age",
+        text: "Tu as quel âge ?",
+        type: "single",
+        options: ["11 – 14 ans", "15 – 17 ans", "18 – 25 ans", "26 – 35 ans", "Plus de 35 ans"],
+        section: "Profil"
+      },
+      {
+        id: "activite",
+        text: "Quelle est ton activité ?",
+        type: "single",
+        options: ["Salarié(e)", "Étudiant(e)", "Lycéen(ne)", "Sans emploi", "Entrepreneur(e)", "Autre"],
+        section: "Profil"
+      },
+
+      // ── CROYANCES & VÉCU ──
+      {
+        id: "religion",
+        text: "De quelle religion es-tu ?",
+        type: "text",
+        placeholder: "Écris ta réponse ici...",
+        subtitle: "Toutes les religions, convictions ou absence de religion sont les bienvenues.",
+        section: "Croyances & Vécu"
+      },
+      {
+        id: "education_religieuse",
+        text: "Considères-tu avoir bénéficié d'une éducation religieuse ?",
+        type: "single",
+        options: ["Oui", "Non"],
+        section: "Croyances & Vécu"
+      },
+      {
+        id: "enseignements_retenus",
+        text: "Quels sont les enseignements que tu as appris et retenus ?",
+        type: "text",
+        placeholder: "Décris librement les valeurs, principes ou récits qui t'ont marqué(e)...",
+        section: "Croyances & Vécu",
+        showIf: { questionId: "education_religieuse", value: "Oui" }
+      },
+      {
+        id: "application_quotidien",
+        text: "Les appliques-tu dans ta vie quotidienne ?",
+        type: "single",
+        options: ["Oui, toujours", "Parfois", "Rarement", "Non"],
+        section: "Croyances & Vécu",
+        showIf: { questionId: "education_religieuse", value: "Oui" }
+      },
+      {
+        id: "discrimination",
+        text: "As-tu déjà subi un acte discriminant en lien avec tes croyances ?",
+        type: "single",
+        options: ["Oui", "Non"],
+        section: "Croyances & Vécu"
+      },
+      {
+        id: "discrimination_impact",
+        text: "À quelle fréquence cela t'est-il arrivé, et comment cela a-t-il impacté ta vie quotidienne ?",
+        type: "text",
+        placeholder: "Partage ton expérience librement...",
+        section: "Croyances & Vécu",
+        showIf: { questionId: "discrimination", value: "Oui" }
+      },
+      {
+        id: "rapport_religion",
+        text: "Quel est ton rapport avec la religion ?",
+        type: "text",
+        placeholder: "Une relation intime, distante, curieuse, conflictuelle... dis-moi en plus.",
+        section: "Croyances & Vécu"
+      },
+      {
+        id: "prejuges_religion",
+        text: "As-tu des idées reçues ou des préjugés sur une religion ?",
+        type: "single_with_open",
+        options: ["Oui", "Non"],
+        openLabel: "Si oui, lesquels ?",
+        openPlaceholder: "Tu peux rester anonyme, c'est un espace sans jugement...",
+        section: "Croyances & Vécu"
+      },
+
+      // ── LE JEU ──
+      {
+        id: "jeux_enligne",
+        text: "Joues-tu à des jeux en ligne ?",
+        type: "single",
+        options: ["Oui, souvent", "Parfois", "Rarement", "Non, jamais"],
+        section: "Le jeu"
+      },
+      {
+        id: "type_jeux",
+        text: "À quel type de jeux joues-tu ?",
+        type: "multi",
+        options: [
+          "Aventure / RPG",
+          "Action / Combat",
+          "Horreur / Survival",
+          "Réflexion / Stratégie",
+          "Quiz / Culture générale",
+          "Jeux de rôle narratifs",
+          "Sport / Course",
+          "Simulation / Gestion",
+          "Casual / Mobile",
+          "Autre"
+        ],
+        subtitle: "Plusieurs réponses possibles.",
+        section: "Le jeu"
+      },
+      {
+        id: "recherche_jeu",
+        text: "Que recherches-tu dans un jeu ?",
+        type: "multi",
+        options: [
+          "Du divertissement pur",
+          "Apprendre quelque chose",
+          "Un défi intellectuel",
+          "Jouer en groupe / multijoueur",
+          "Une histoire immersive",
+          "La compétition",
+          "Me détendre / décompresser",
+          "Autre"
+        ],
+        section: "Le jeu"
+      },
+      {
+        id: "format_jeu",
+        text: "Sur quel format préfères-tu jouer ?",
+        type: "single",
+        options: [
+          "Jeu de société",
+          "Jeu interactif type Undercover",
+          "Les deux",
+          "Jeu vidéo (à venir plus tard)"
+        ],
+        subtitle: "Le format jeu vidéo est prévu, mais pour une prochaine phase.",
+        section: "Le jeu"
+      },
+      {
+        id: "prejudices_jeu",
+        text: "Penses-tu qu'un jeu peut aider à lutter contre les préjugés et la désinformation sur une religion ?",
+        type: "scale",
+        min: "Pas du tout",
+        max: "Absolument",
+        section: "Le jeu"
+      },
+      {
+        id: "concept_interet",
+        text: "Notre premier jeu portera sur l'Islam et son histoire. Est-ce que ce concept t'intéresse ?",
+        type: "scale",
+        min: "Pas du tout",
+        max: "Vraiment beaucoup",
+        section: "Le jeu"
+      },
+      {
+        id: "aspects_islam",
+        text: "Quels aspects de l'Islam t'intéresseraient dans un jeu ?",
+        type: "multi",
+        options: [
+          "Histoire et origines",
+          "Figures importantes (Prophète, savants...)",
+          "Culture, art & architecture",
+          "Sciences & inventions islamiques",
+          "Valeurs et éthique",
+          "Rites et pratiques",
+          "Civilisation et empires",
+          "Autre"
+        ],
+        section: "Le jeu"
+      },
+      {
+        id: "important_jeu",
+        text: "Qu'est-ce qui est le plus important pour toi dans un jeu ?",
+        type: "multi",
+        options: [
+          "Des règles simples et claires",
+          "Un design soigné",
+          "Des questions variées et originales",
+          "Une bonne rejouabilité",
+          "Un équilibre entre fun et apprentissage",
+          "Accessible à tout âge",
+          "Autre"
+        ],
+        section: "Le jeu"
+      },
+      {
+        id: "attrayant",
+        text: "Qu'est-ce qui rendrait le jeu attrayant pour toi ?",
+        type: "multi",
+        options: [
+          "Un design soigné et une belle direction artistique",
+          "Vraiment apprendre quelque chose d'utile",
+          "Des anecdotes et infos surprenantes",
+          "Un système de points et classement",
+          "Un chronomètre pour l'intensité",
+          "Mode solo et multijoueur",
+          "Des niveaux de difficulté variés",
+          "Autre"
+        ],
+        section: "Le jeu"
+      },
+
+      // ── SUGGESTIONS ──
+      {
+        id: "budget",
+        text: "Combien serais-tu prêt(e) à payer pour ce jeu ?",
+        type: "single",
+        options: [
+          "Moins de 5 €",
+          "Entre 5 € et 10 €",
+          "Entre 10 € et 20 €",
+          "Plus de 20 €",
+          "Je ne paierais pas — je veux que ce soit gratuit"
+        ],
+        section: "Suggestions"
+      },
+      {
+        id: "commentaire",
+        text: "Tu as une idée, une suggestion ou un commentaire ?",
+        type: "text",
+        placeholder: "Écris ici... (facultatif)",
+        required: false,
+        section: "Suggestions"
+      }
     ];
 
-    let current = 0;
     let answers = {};
+    let history = []; // stack of question indices shown
+
+    // Build the active question list based on current answers
+    function buildFlow() {
+      return ALL_QUESTIONS.filter(q => {
+        if (!q.showIf) return true;
+        return answers[q.showIf.questionId] === q.showIf.value;
+      });
+    }
+
+    let QUESTIONS = buildFlow();
+    let current = 0;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -668,11 +904,13 @@
     }
 
     function startSurvey() {
+      QUESTIONS = buildFlow();
       showScreen('screen-survey');
       render();
     }
 
     function render() {
+      QUESTIONS = buildFlow();
       const q = QUESTIONS[current];
       const total = QUESTIONS.length;
       const pct = Math.round((current / total) * 100);
@@ -697,11 +935,12 @@
       const body = document.getElementById('q-body');
       body.innerHTML = '';
 
+      // ── SINGLE SELECT ──
       if (q.type === 'single') {
         const wrap = document.createElement('div');
         wrap.className = 'options';
         let autreInput = null;
-        const otherOpts = q.options.slice(0, -1);
+        const otherOpts = q.options.filter(o => o !== 'Autre');
 
         q.options.forEach(opt => {
           const isAutre = opt === 'Autre';
@@ -739,6 +978,93 @@
         body.appendChild(wrap);
       }
 
+      // ── SINGLE + OPEN (Oui → champ texte conditionnel inline) ──
+      else if (q.type === 'single_with_open') {
+        const wrap = document.createElement('div');
+        wrap.className = 'options';
+
+        let openContainer = null;
+
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          const isSelected = answers[q.id + '_choice'] === opt;
+          btn.className = 'option' + (isSelected ? ' selected' : '');
+          btn.innerHTML = `<span class="opt-dot"></span><span>${opt}</span>`;
+          btn.onclick = () => {
+            wrap.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            answers[q.id + '_choice'] = opt;
+            answers[q.id] = opt;
+            document.getElementById('error-msg').classList.remove('show');
+            if (opt === 'Oui') {
+              openContainer.classList.add('visible');
+              openContainer.focus();
+            } else {
+              openContainer.classList.remove('visible');
+              answers[q.id + '_detail'] = '';
+            }
+          };
+          wrap.appendChild(btn);
+        });
+
+        // Open text area for "Oui"
+        openContainer = document.createElement('textarea');
+        openContainer.className = 'text-input autre-input' + (answers[q.id + '_choice'] === 'Oui' ? ' visible' : '');
+        openContainer.style.marginTop = '16px';
+        openContainer.style.display = answers[q.id + '_choice'] === 'Oui' ? 'block' : 'none';
+        openContainer.placeholder = q.openPlaceholder || 'Précise ta réponse...';
+        openContainer.value = answers[q.id + '_detail'] || '';
+        openContainer.oninput = (e) => { answers[q.id + '_detail'] = e.target.value; };
+        // Override visible to use display block
+        openContainer.classList.remove('autre-input');
+        openContainer.className = 'text-input';
+        openContainer.style.display = answers[q.id + '_choice'] === 'Oui' ? 'block' : 'none';
+        openContainer.style.marginTop = '16px';
+
+        // Re-wire btn clicks to toggle display
+        const btns = wrap.querySelectorAll('.option');
+        // We append it after the wrap, intercept at render time
+        body.appendChild(wrap);
+
+        // Label
+        if (q.openLabel) {
+          const lbl = document.createElement('p');
+          lbl.className = 'hint';
+          lbl.style.marginTop = '20px';
+          lbl.textContent = q.openLabel;
+          lbl.id = 'open_label_' + q.id;
+          lbl.style.display = answers[q.id + '_choice'] === 'Oui' ? 'block' : 'none';
+          body.appendChild(lbl);
+        }
+
+        body.appendChild(openContainer);
+
+        // Fix toggle after DOM insertion
+        wrap.querySelectorAll('.option').forEach((btn, idx) => {
+          btn.onclick = () => {
+            wrap.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const opt = q.options[idx];
+            answers[q.id + '_choice'] = opt;
+            answers[q.id] = opt;
+            document.getElementById('error-msg').classList.remove('show');
+            const lbl = document.getElementById('open_label_' + q.id);
+            if (opt === 'Oui') {
+              openContainer.style.display = 'block';
+              if (lbl) lbl.style.display = 'block';
+              openContainer.focus();
+            } else {
+              openContainer.style.display = 'none';
+              if (lbl) lbl.style.display = 'none';
+              answers[q.id + '_detail'] = '';
+            }
+          };
+        });
+
+        return; // already appended
+      }
+
+      // ── MULTI SELECT ──
       else if (q.type === 'multi') {
         if (!answers[q.id]) answers[q.id] = [];
         const wrap = document.createElement('div');
@@ -794,6 +1120,7 @@
         body.appendChild(wrap);
       }
 
+      // ── SCALE ──
       else if (q.type === 'scale') {
         const wrap = document.createElement('div');
         const scaleWrap = document.createElement('div');
@@ -818,6 +1145,7 @@
         body.appendChild(wrap);
       }
 
+      // ── TEXT ──
       else if (q.type === 'text') {
         const ta = document.createElement('textarea');
         ta.className = 'text-input';
@@ -827,6 +1155,7 @@
         body.appendChild(ta);
       }
 
+      // ── LINE INPUT ──
       else if (q.type === 'line_input') {
         const input = document.createElement('input');
         input.type = 'text';
@@ -846,13 +1175,16 @@
     function validate() {
       const q = QUESTIONS[current];
       if (q.required === false) return true;
+      if (q.type === 'text') return true; // open questions always pass
       if (q.type === 'multi') return answers[q.id] && answers[q.id].length > 0;
-      if (q.type === 'text') return true;
+      if (q.type === 'single_with_open') return !!answers[q.id + '_choice'];
       return !!answers[q.id];
     }
 
     function nextQ() {
       if (!validate()) { document.getElementById('error-msg').classList.add('show'); return; }
+      // Rebuild flow after answering (handles conditional questions)
+      QUESTIONS = buildFlow();
       if (current < QUESTIONS.length - 1) { current++; render(); }
     }
 
